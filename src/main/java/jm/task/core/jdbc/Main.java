@@ -19,13 +19,12 @@ public class Main {
         userService.saveUser("Nick", "Hamilson", (byte) 44);
         userService.saveUser("Elvis", "Presli", (byte) 55);
 
-        userService.removeUserById(2);
-
         System.out.println(userService.getAllUsers());
+
+//        userService.removeUserById(2);
+
+        userService.saveUser("Jim", "Brown", (byte) 33);
 
         userService.cleanUsersTable();
-
-        System.out.println(userService.getAllUsers());
-
     }
 }
