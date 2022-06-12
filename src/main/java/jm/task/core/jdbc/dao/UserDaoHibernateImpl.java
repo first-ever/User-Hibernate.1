@@ -9,18 +9,19 @@ import org.hibernate.Transaction;
 import org.hibernate.query.Query;
 
 import javax.persistence.EntityManager;
+import javax.persistence.Transient;
 import java.util.LinkedList;
 import java.util.List;
 
 public class UserDaoHibernateImpl implements UserDao {
     public UserDaoHibernateImpl() {
     }
+
     @Override
     public void createUsersTable() {
-        Session session = Util.getSessionFactory().openSession();
-        Transaction transaction;
-        try {
-            transaction=session.beginTransaction();
+        Transaction transaction = null;
+        try (Session session = Util.getSessionFactory().openSession()) {
+            transaction = session.beginTransaction();
             session.createSQLQuery("CREATE TABLE IF NOT EXISTS user (id MEDIUMINT NOT NULL AUTO_INCREMENT, " +
                     "name CHAR(30) NOT NULL, " +
                     "lastName CHAR(30), " +
@@ -29,87 +30,75 @@ public class UserDaoHibernateImpl implements UserDao {
             transaction.commit();
         } catch (Exception e) {
             e.printStackTrace();
-        } finally {
-            session.close();
+            transaction.rollback();
         }
     }
 
     @Override
     public void dropUsersTable() {
-        Session session = Util.getSessionFactory().openSession();
-        Transaction transaction;
-        try {
-            transaction=session.beginTransaction();
+        Transaction transaction = null;
+        try (Session session = Util.getSessionFactory().openSession()) {
+            transaction = session.beginTransaction();
             session.createSQLQuery("drop table if exists user").executeUpdate();
             transaction.commit();
         } catch (Exception e) {
             e.printStackTrace();
-        } finally {
-            session.close();
+            transaction.rollback();
         }
     }
 
     @Override
     public void saveUser(String name, String lastName, byte age) {
-        Session session = Util.getSessionFactory().openSession();
         Transaction transaction = null;
-        try {
-            transaction=session.beginTransaction();
-            session.save(new User(name,lastName,age));
+        try (Session session = Util.getSessionFactory().openSession()) {
+            transaction = session.beginTransaction();
+            session.save(new User(name, lastName, age));
             transaction.commit();
             System.out.println("Пользователь с именем - " + name + " был добавлен в базу данных");
         } catch (Exception e) {
             e.printStackTrace();
-        } finally {
-            session.close();
+            transaction.rollback();
         }
     }
 
     @Override
     public void removeUserById(long id) {
-        Session session = Util.getSessionFactory().openSession();
         Transaction transaction = null;
-        try {
-            transaction=session.beginTransaction();
+        try (Session session = Util.getSessionFactory().openSession()) {
+            transaction = session.beginTransaction();
             session.delete(session.get(User.class, id));
             transaction.commit();
         } catch (Exception e) {
             e.printStackTrace();
-        } finally {
-            session.close();
+            transaction.rollback();
         }
     }
 
     @Override
     public List<User> getAllUsers() {
-        Session session = Util.getSessionFactory().openSession();
-        Transaction transaction;
+        Transaction transaction = null;
         List<User> users = new LinkedList<>();
-        try {
-            transaction=session.beginTransaction();
+        try (Session session = Util.getSessionFactory().openSession()) {
+            transaction = session.beginTransaction();
             users = session.createQuery("From User").list();
-            transaction.commit();
+
         } catch (Exception e) {
             e.printStackTrace();
-        } finally {
-            session.close();
+            transaction.rollback();
         }
         return users;
     }
 
     @Override
     public void cleanUsersTable() {
-
-        Session session = Util.getSessionFactory().openSession();
-        Transaction transaction;
-        try {
-            transaction=session.beginTransaction();
+        Transaction transaction = null;
+        try (Session session = Util.getSessionFactory().openSession()) {
+            transaction = session.beginTransaction();
             session.createQuery("delete from User").executeUpdate();
-            transaction.commit();
+
         } catch (Exception e) {
             e.printStackTrace();
-        } finally {
-            session.close();
+            transaction.rollback();
         }
     }
 }
